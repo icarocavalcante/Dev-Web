@@ -1,17 +1,32 @@
-import { Outlet } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 
 const Layout = () => {
     return (
-        <div className="container">
-            <div className="card card-shadow my-10">
-                <div className="card-header">
-                    <h3>Sistema de Suporte</h3>
+        <div className="d-flex flex-column vh-100" style={{flex: 1}}>
+            
+            <header>
+                <div className="container">
+                    <nav className="navbar bg-light navbar-expand-lg">
+                        <div className="container-fluid">
+                            <Link className="navbar-brand" to='/'>Sistema de Suporte</Link>
+                        </div>
+                    </nav>
                 </div>
-                <div className="card-body">
+            </header>
+            
+            <main>
+                <div className="container">
                     <Outlet />
                 </div>
-            </div>
-        </div>
+            </main>
+            <footer className="mt-5">
+                <div className="container text-center">
+                    <p>Desenvolvido na disciplina de Desenvolvimento Web</p>
+                    <p>Thiago e Ícaro</p>
+                    <p>&copy; 2022 - Estacio</p>
+                </div>
+            </footer>
+        </div> 
     )
 }
 
