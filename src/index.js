@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import Home from './pages/home'
 import Layout from './layout';
+import {Cliente, NovoCliente} from './pages/login/cliente';
+import Suporte from './pages/login/suporte';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +16,13 @@ root.render(
         <Route path='/' element={<Layout/>}>
           <Route path='/' element={<Navigate to='/home'/>} />
           <Route path='home' element={<Home />}/>
+          <Route path='login'>
+            <Route path='cliente'>
+              <Route path='' element={<Cliente />}/>
+              <Route path='new' element={<NovoCliente />}/>
+            </Route>
+            <Route path='suporte' element={<Suporte />}/>
+          </Route>
         </Route>
       </Routes>
     </Router>
