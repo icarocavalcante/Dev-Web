@@ -8,14 +8,14 @@ const Home = () => {
                     <h2>Escolha o seu perfil</h2>
                 </div>
                 <div className="card-body">
-                    <table className="table text-center">
+                    <table className="container">
                         <tbody>
-                            <tr>
+                            <tr className="d-flex justify-content-around">
                                 <td>
-                                    <Link to='/login/cliente'>Cliente</Link>
+                                    <Link className="btn btn-primary" to='/login/cliente'>Cliente</Link>
                                 </td>
                                 <td>
-                                    <Link to='/login/suporte'>Suporte</Link>
+                                    <Link className="btn btn-primary" to='/login/suporte'>Suporte</Link>
                                 </td>
                             </tr>
                         </tbody>
