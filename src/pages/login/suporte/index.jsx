@@ -1,13 +1,14 @@
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { FIREBASE_URL } from '../../../constants'
+import Context from "../../../context"
 
 const Suporte = () => {
     const [suporte, setSuporte] = useState({usuario: "", senha: ""})
     const [dbSuporte, setDbSuporte] = useState([])
     const [loading, setLoading] = useState(false)
-    const [autenticado, setAutenticado] = useState(false)
+    const {suporteAutenticado, setSuporteAutenticado} = useContext(Context)
     const redirecionar = useNavigate()
 
     const handleSubmit = (e)=>{
@@ -23,7 +24,6 @@ const Suporte = () => {
                 setDbSuporte(retorno)
             } else {
                 setDbSuporte([])
-                setAutenticado(false)
             }
             })
             .catch((err) => alert(err))
@@ -34,19 +34,21 @@ const Suporte = () => {
         }
 
         useEffect(() => {
+            setSuporteAutenticado(false)
             for (let index = 0; index < dbSuporte.length; index++) {
                 if (dbSuporte[index][1].usuario === suporte.usuario && dbSuporte[index][1].senha === suporte.senha) {
-                    setAutenticado(true)
+                    setSuporteAutenticado(true)
                 }
             }
-        },[dbSuporte, suporte.senha, suporte.usuario])
+        },[dbSuporte, suporte.senha, suporte.usuario, setSuporteAutenticado ])
 
         useEffect(() => {
-            if (autenticado) {
+            if (suporteAutenticado) {
+                console.log(suporteAutenticado)
                 alert(`Bem vindo(a), ${suporte.usuario}`)
-                redirecionar('/home')
+                redirecionar('/login/suporte/logado')
             }
-        },[autenticado, suporte.usuario, redirecionar])
+        },[suporteAutenticado, suporte.usuario, redirecionar])
 
     return (
         <div className="container d-flex justify-content-center">
@@ -67,6 +69,7 @@ const Suporte = () => {
                     </div>
                 </form>
                 {loading && <div className="container">Carregando ...</div>}
+
             </section>
             {/* <table className="table table-striped">
                 <tbody>

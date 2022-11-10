@@ -5,10 +5,11 @@ import Context from "../context"
 
 const Layout = () => {
     
-    const [autenticado, setAutenticado] = useState()
+    const [clienteAutenticado, setClienteAutenticado] = useState()
+    const [suporteAutenticado, setSuporteAutenticado] = useState()
 
     return (
-        <Context.Provider value={{autenticado, setAutenticado}}>
+        <Context.Provider value={{clienteAutenticado, setClienteAutenticado, suporteAutenticado, setSuporteAutenticado}}>
 
 
             <div className="d-flex flex-column vh-100" style={{flex: 1}}>

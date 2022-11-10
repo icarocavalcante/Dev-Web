@@ -8,6 +8,7 @@ import Layout from './layout';
 import {Cliente, NovoCliente} from './pages/login/cliente';
 import ClienteLogado from './pages/login/cliente/Logado';
 import Suporte from './pages/login/suporte';
+import SuporteLogado from './pages/login/suporte/logado';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -25,7 +26,12 @@ root.render(
                 <Route path='' element={<ClienteLogado />}/>
               </Route>
             </Route>
-            <Route path='suporte' element={<Suporte />}/>
+            <Route path='suporte'>
+              <Route path='' element={<Suporte />} />
+              <Route path='logado' >
+                <Route path='' element={<SuporteLogado />}/>
+              </Route>
+            </Route>
           </Route>
         </Route>
       </Routes>

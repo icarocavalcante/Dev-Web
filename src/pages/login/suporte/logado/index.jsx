@@ -1,16 +1,16 @@
 import { useContext } from 'react'
 import Context from '../../../../context'
 
-const ClienteLogado = () => {
-    const {clienteAutenticado} = useContext(Context)
+const SuporteLogado = () => {
+    const {suporteAutenticado} = useContext(Context)
 
     return (
         <div>
-            {clienteAutenticado &&
+            {suporteAutenticado &&
                 <h1>Autenticado</h1>
             }
         </div>
     )
 }
 
-export default ClienteLogado
+export default SuporteLogado

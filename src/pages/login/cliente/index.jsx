@@ -8,7 +8,7 @@ const Cliente = () => {
     const [cliente, setCliente] = useState({usuario: "", senha: ""})
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
-    const {autenticado, setAutenticado} = useContext(Context)
+    const {clienteAutenticado, setClienteAutenticado} = useContext(Context)
     const redirecionar = useNavigate()
     
     const handleSubmit = (e)=>{
@@ -34,20 +34,20 @@ const Cliente = () => {
         }
 
         useEffect(() => {
-            setAutenticado(false)
+            setClienteAutenticado(false)
             for (let index = 0; index < dbCliente.length; index++) {
                 if (dbCliente[index][1].usuario === cliente.usuario && dbCliente[index][1].senha === cliente.senha) {
-                    setAutenticado(true)
+                    setClienteAutenticado(true)
                 }
             }
-        },[dbCliente, cliente.usuario, cliente.senha, setAutenticado])
+        },[dbCliente, cliente.usuario, cliente.senha, setClienteAutenticado])
 
         useEffect(() => {
-            if (autenticado) {
+            if (clienteAutenticado) {
                 alert(`Bem vindo(a), ${cliente.usuario}`)
                 redirecionar('/login/cliente/logado')
             }
-        },[autenticado, cliente.usuario, redirecionar])
+        },[clienteAutenticado, cliente.usuario, redirecionar])
 
     return (
                 <div className="container d-flex justify-content-center">
