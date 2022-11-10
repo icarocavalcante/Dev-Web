@@ -8,7 +8,7 @@ const Suporte = () => {
     const [dbSuporte, setDbSuporte] = useState([])
     const [loading, setLoading] = useState(false)
     const [autenticado, setAutenticado] = useState(false)
-    const navigate = useNavigate()
+    const redirecionar = useNavigate()
 
     const handleSubmit = (e)=>{
         e.preventDefault()
@@ -39,20 +39,19 @@ const Suporte = () => {
                     setAutenticado(true)
                 }
             }
-        },[dbSuporte])
+        },[dbSuporte, suporte.senha, suporte.usuario])
 
         useEffect(() => {
             if (autenticado) {
                 alert(`Bem vindo(a), ${suporte.usuario}`)
-                navigate("/home")
+                redirecionar('/home')
             }
-        },[autenticado])
+        },[autenticado, suporte.usuario, redirecionar])
 
     return (
         <div className="container d-flex justify-content-center">
-            {loading && <div className="container">Carregando ...</div>}
             <section className="card w-50 shadow my-5 text-center d-flex flex-column">
-                <h4>Login</h4>
+                <h4>Login - Suporte</h4>
                 <form action="" method="post" className="form" onSubmit={handleSubmit}>
                     <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
                         <label htmlFor="txtUsuario" className="form-label col-2">Usuário</label>
@@ -67,6 +66,7 @@ const Suporte = () => {
                         <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
+                {loading && <div className="container">Carregando ...</div>}
             </section>
             {/* <table className="table table-striped">
                 <tbody>

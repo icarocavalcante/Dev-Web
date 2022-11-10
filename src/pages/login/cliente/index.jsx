@@ -8,7 +8,7 @@ const Cliente = () => {
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
     const [autenticado, setAutenticado] = useState(false)
-    const navigate = useNavigate()
+    const redirecionar = useNavigate()
 
     const handleSubmit = (e)=>{
         e.preventDefault()
@@ -39,20 +39,19 @@ const Cliente = () => {
                     setAutenticado(true)
                 }
             }
-        },[dbCliente])
+        },[dbCliente, cliente.usuario, cliente.senha])
 
         useEffect(() => {
             if (autenticado) {
                 alert(`Bem vindo(a), ${cliente.usuario}`)
-                navigate("/home")
+                redirecionar('/home')
             }
-        },[autenticado])
+        },[autenticado, cliente.usuario, redirecionar])
 
     return (
         <div className="container d-flex justify-content-center">
-            {loading && <div className="container">Carregando ...</div>}
             <section className="card w-50 shadow my-5 text-center d-flex flex-column">
-                <h4>Login</h4>
+                <h4>Login - Cliente</h4>
                 <form action="" method="post" className="form" onSubmit={handleSubmit}>
                     <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
                         <label htmlFor="txtUsuario" className="form-label col-2">Usuário</label>
@@ -68,6 +67,7 @@ const Cliente = () => {
                         <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
+                {loading && <div className="container">Carregando ...</div>}
             </section>
             {/* <table className="table table-striped">
                 <tbody>
@@ -89,21 +89,56 @@ const Cliente = () => {
 const NovoCliente = () => {
     const [cliente, setCliente] = useState({usuario: "", senha: ""})
     const [loading, setLoading] = useState(false)
+    const [novoUsuario, setNovoUsuario] = useState(true)
+    const [dbUsuario, setDbUsuario] = useState("")
+    const redirecionar = useNavigate()
+
+    useEffect(() => {
+        axios
+        .get(`${FIREBASE_URL}/cliente.json`)
+        .then(({data, status}) => {
+            if (status === 200){
+                const retorno = Object
+                    .entries(data)
+                setDbUsuario(retorno)
+            } else {
+                setDbUsuario([])
+            }
+            })
+            .catch((err) => alert(err))   
+    }, [cliente.usuario])
+
+    useEffect(() => {
+        for (let index = 0; index < dbUsuario.length; index++) {
+            if (dbUsuario[index][1].usuario === cliente.usuario) {
+                setNovoUsuario(false)
+            }
+        }
+    },[cliente.usuario, dbUsuario])
 
     const handleSubmit = (e)=>{
         e.preventDefault()
         setLoading(true)
-        axios
-            .post(`${FIREBASE_URL}/cliente.json`, cliente)
-            .then(({data}) => alert(`Cadastro bem sucedido. Salve o ID: ${data.name}`))
-            .catch((err) => alert(err))
-            .finally(setLoading(false))
+        if(!novoUsuario){
+            alert("Usuário já existe.")
+            setLoading(false)
+        } else {
+            axios
+                .post(`${FIREBASE_URL}/cliente.json`, cliente)
+                .then(({data}) => {
+                    alert(`Cadastro bem sucedido. Salve o ID: ${data.name}`)
+                    redirecionar('/cliente')
+                })
+                .catch((err) => alert(err))
+                .finally(() => {
+                    setLoading(false)
+                })
+        }
     }
 
 
     return (
         <div className="container d-flex justify-content-center">
-            {loading && <div className="container">Carregando ...</div>}
             <section className="card w-50 shadow my-5 text-center d-flex flex-column">
                 <h4>Novo Cadastro</h4>
                 <form action="" method="post" className="form" onSubmit={handleSubmit}>
@@ -120,6 +155,7 @@ const NovoCliente = () => {
                         <Link to="/login/cliente" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
+                {loading && <div className="container">Carregando ...</div>}   
             </section>
         </div>
     )
