@@ -7,10 +7,40 @@ const Layout = () => {
     
     const [clienteAutenticado, setClienteAutenticado] = useState()
     const [suporteAutenticado, setSuporteAutenticado] = useState()
+    const [atualCliente, setAtualCliente] = useState()
+    const [atualSuporte, setAtualSuporte] = useState()
+    const [ticket, setTicket] = useState({
+        id: "",
+        usuario: "",
+        status: "",
+        dtAbertura: "",
+        dtConclusao: "",
+        assunto: "",
+        descricao: "",
+        operador: ""
+    })
+    const [defaultTicket, setDefaultTicket] = useState([])
+    const [tickets, setTickets] = useState([])
+    const [contador, setContador] = useState([])
 
     return (
-        <Context.Provider value={{clienteAutenticado, setClienteAutenticado, suporteAutenticado, setSuporteAutenticado}}>
-
+        <Context.Provider value={{atualCliente,
+        setAtualCliente,
+        atualSuporte,
+        setAtualSuporte,
+        clienteAutenticado,
+        setClienteAutenticado,
+        suporteAutenticado,
+        setSuporteAutenticado,
+        ticket,
+        setTicket,
+        defaultTicket,
+        setDefaultTicket,
+        tickets,
+        setTickets,
+        contador,
+        setContador
+        }}>
 
             <div className="d-flex flex-column vh-100" style={{flex: 1}}>
                 

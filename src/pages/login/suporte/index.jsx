@@ -8,7 +8,7 @@ const Suporte = () => {
     const [suporte, setSuporte] = useState({usuario: "", senha: ""})
     const [dbSuporte, setDbSuporte] = useState([])
     const [loading, setLoading] = useState(false)
-    const {suporteAutenticado, setSuporteAutenticado} = useContext(Context)
+    const {suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte} = useContext(Context)
     const redirecionar = useNavigate()
 
     const handleSubmit = (e)=>{
@@ -37,6 +37,7 @@ const Suporte = () => {
             setSuporteAutenticado(false)
             for (let index = 0; index < dbSuporte.length; index++) {
                 if (dbSuporte[index][1].usuario === suporte.usuario && dbSuporte[index][1].senha === suporte.senha) {
+                    setAtualSuporte(`${suporte.usuario}`)
                     setSuporteAutenticado(true)
                 }
             }
@@ -44,8 +45,7 @@ const Suporte = () => {
 
         useEffect(() => {
             if (suporteAutenticado) {
-                console.log(suporteAutenticado)
-                alert(`Bem vindo(a), ${suporte.usuario}`)
+                alert(`Bem vindo(a), ${atualSuporte}`)
                 redirecionar('/login/suporte/logado')
             }
         },[suporteAutenticado, suporte.usuario, redirecionar])

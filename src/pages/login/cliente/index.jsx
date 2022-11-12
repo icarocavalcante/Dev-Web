@@ -8,7 +8,7 @@ const Cliente = () => {
     const [cliente, setCliente] = useState({usuario: "", senha: ""})
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
-    const {clienteAutenticado, setClienteAutenticado} = useContext(Context)
+    const {clienteAutenticado, setClienteAutenticado, atualCliente, setAtualCliente} = useContext(Context)
     const redirecionar = useNavigate()
     
     const handleSubmit = (e)=>{
@@ -37,6 +37,7 @@ const Cliente = () => {
             setClienteAutenticado(false)
             for (let index = 0; index < dbCliente.length; index++) {
                 if (dbCliente[index][1].usuario === cliente.usuario && dbCliente[index][1].senha === cliente.senha) {
+                    setAtualCliente(`${cliente.usuario}`)
                     setClienteAutenticado(true)
                 }
             }
@@ -44,7 +45,7 @@ const Cliente = () => {
 
         useEffect(() => {
             if (clienteAutenticado) {
-                alert(`Bem vindo(a), ${cliente.usuario}`)
+                alert(`Bem vindo(a), ${atualCliente}`)
                 redirecionar('/login/cliente/logado')
             }
         },[clienteAutenticado, cliente.usuario, redirecionar])
@@ -70,19 +71,6 @@ const Cliente = () => {
                         </form>
                         {loading && <div className="container">Carregando ...</div>}
                     </section>
-                    {/* <table className="table table-striped">
-                        <tbody>
-                            {dbCliente.map((el, ix) => {
-                                return(
-                                    <tr key={ix}>
-                                        <td>{el[1].usuario}</td>
-                                        <td>{el[1].senha}</td>
-                                    </tr>
-                                )
-                                })
-                            }
-                        </tbody>
-                        </table> */}
                 </div>
     )
 }
