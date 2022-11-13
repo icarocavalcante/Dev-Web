@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Home from './pages/home'
 import Layout from './layout';
 import {Cliente, NovoCliente} from './pages/login/cliente';
-import ClienteLogado, { NovoTicket } from './pages/login/cliente/Logado';
+import ClienteLogado, { NovoTicket, Tickets } from './pages/login/cliente/Logado';
 import Suporte from './pages/login/suporte';
 import SuporteLogado from './pages/login/suporte/logado';
 
@@ -23,8 +23,9 @@ root.render(
               <Route path='' element={<Cliente />}/>
               <Route path='new' element={<NovoCliente />}/>
               <Route path='logado' >
-                <Route path='' element={<ClienteLogado />}/>
-                <Route path='new' element={<NovoTicket />}/>
+                <Route path='' element={<ClienteLogado />} />
+                <Route path='new' element={<NovoTicket />} />
+                <Route path=':key' element={<Tickets />} />
               </Route>
             </Route>
             <Route path='suporte'>

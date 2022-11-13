@@ -1,11 +1,12 @@
 import axios from 'axios'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import Context from '../../../../context'
 import { FIREBASE_URL } from '../../../../constants'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 const ClienteLogado = () => {
     const { clienteAutenticado, setClienteAutenticado, atualCliente, tickets, setTickets } = useContext(Context)
+    const redirecionar = useNavigate()
 
     async function BuscarTickets() {
         if (clienteAutenticado) {
@@ -13,7 +14,7 @@ const ClienteLogado = () => {
                 .get(`${FIREBASE_URL}/tickets.json`)
                 .then(({ data, status }) => {
                     if (status === 200) {
-                        const retorno = Object.entries(data).map(([key, value]) => { return {...value}})
+                        const retorno = Object.entries(data).map(([key, value]) => { return {...value, key: key}})
                         setTickets(retorno)
                     } else {
                         setTickets([])
@@ -22,6 +23,12 @@ const ClienteLogado = () => {
                 .catch((err) => alert(err))
                 .finally(() => setClienteAutenticado(true))
         }
+    }
+
+    function Loggout() {
+        setClienteAutenticado(false)
+        alert(`Volte sempre, ${atualCliente}`)
+        redirecionar('/')
     }
 
     return (
@@ -58,12 +65,12 @@ const ClienteLogado = () => {
                             if (el.usuario === atualCliente) {
                                 return (
                                     <tr key={ix}>
-                                        <td>{el.id}</td>
-                                        <td>{el.usuario}</td>
-                                        <td>{el.status}</td>
-                                        <td>{el.dtAbertura}</td>
-                                        <td>{el.dtConclusao}</td>
-                                        <td>{el.operador}</td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.usuario}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
                                     </tr>
                                 )
                             }
@@ -71,6 +78,9 @@ const ClienteLogado = () => {
                         }
                     </tbody>
                 </table>
+                </section>
+                <section className='container d-flex justify-content-center'>
+                    <button onClick={Loggout} className="btn btn-danger mt-3">Sair</button>
                 </section>
             </div>
         </div>
@@ -86,7 +96,7 @@ export function NovoTicket () {
         
         axios
         .post(`${FIREBASE_URL}/tickets.json`, ticket)
-        .then(({data}) => {
+        .then(() => {
             alert(`Ticket criado. ID: ${ticket.id}`)
             redirecionar('/login/cliente/logado')
         })
@@ -110,13 +120,21 @@ export function NovoTicket () {
 
     function AlteraAssunto(assunto) {
         BuscaContador()
-        setTicket({assunto: assunto.target.value, descricao: `${ticket.descricao}`, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1 , dtAbertura: Date.now(), dtConclusao: "", operador: ""})
+        setTicket({assunto: assunto.target.value, descricao: `${ticket.descricao}`, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1 , dtAbertura: dataHora(), dtConclusao: "", operador: ""})
     }
     
     function AlteraDescricao(descricao) {
         BuscaContador()
-        setTicket({assunto: `${ticket.assunto}`, descricao: descricao.target.value, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1, dtAbertura: Date.now(), dtConclusao: "", operador: ""})
+        setTicket({assunto: `${ticket.assunto}`, descricao: descricao.target.value, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1, dtAbertura: dataHora(), dtConclusao: "", operador: ""})
     }
+
+    const dataHora = () => {
+        let time = new Date()
+        let dataHora = time.toLocaleString()
+        return dataHora
+    }
+
+
 
     return (
         <div className="container">
@@ -137,6 +155,75 @@ export function NovoTicket () {
                     </div>
                 </form>
             </section>
+        </div>
+    )
+}
+
+export function Tickets () {
+    const {clienteAutenticado, atualCliente, ticket, setTicket} = useContext(Context)
+    const { key } = useParams()
+
+    useEffect(() => {
+        if (key) {
+            axios
+                .get(`${FIREBASE_URL}/tickets/${key}.json`)
+                .then(({data}) => {setTicket(data)})
+                .catch((err) => alert(err))
+        }
+    }, [key])
+
+    return (
+        <div className='container'>
+            {clienteAutenticado &&
+                <h1>Cliente: {`${atualCliente}`}</h1>
+            }
+            <div className="container">
+                <nav className='my-3 navbar bg-light container-fluid'>
+                    <table>
+                        <thead>
+                            <tr>
+                                 <td className='navbar-brand'>Ticket - {`${ticket.assunto}`}</td>
+                            </tr>
+                        </thead>
+                    </table>
+                </nav>
+
+
+                <section>
+                <table className="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Status</th>
+                            <th>Data de Abertura</th>
+                            <th>Data de Conclusao</th>
+                            <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{ticket.id}</td>
+                            <td>{ticket.usuario}</td>
+                            <td>{ticket.status}</td>
+                            <td>{ticket.dtAbertura}</td>
+                            <td>{ticket.dtConclusao}</td>
+                            <td>{ticket.operador}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </section>
+
+                <section>
+                    <label className="form-label" htmlFor="txtDescricao">Descrição do Ticket</label>
+                    <textarea className='form-control' id="textDescricao" rows={5} value={`${ticket.descricao}`}/>
+                    <label className="form-label" htmlFor="txtResposta">Resposta do Operador</label>
+                    <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`}/>
+                </section>
+                <section className='container d-flex justify-content-center'>
+                    <Link to="/login/cliente/logado" className="btn btn-danger mt-3">Voltar</Link>
+                </section>
+            </div>
         </div>
     )
 }
