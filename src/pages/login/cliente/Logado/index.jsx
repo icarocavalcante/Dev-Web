@@ -31,6 +31,8 @@ const ClienteLogado = () => {
         redirecionar('/')
     }
 
+    useEffect(() => BuscarTickets, [clienteAutenticado])
+
     return (
         <div className='container'>
             {clienteAutenticado &&
@@ -42,7 +44,7 @@ const ClienteLogado = () => {
                         <thead>
                             <tr>
                                  <td><Link to='/login/cliente/logado/new'className='navbar-brand'>Novo Ticket</Link></td>
-                                 <td><button className='btn btn-secondary' onClick={BuscarTickets} >Atualizar</button></td>
+                                 <td></td>
                             </tr>
                         </thead>
                     </table>
@@ -53,11 +55,11 @@ const ClienteLogado = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Usuário</th>
-                            <th>Status</th>
+                            <th>Assunto</th>
                             <th>Data de Abertura</th>
                             <th>Data de Conclusao</th>
                             <th>Operador</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,11 +68,11 @@ const ClienteLogado = () => {
                                 return (
                                     <tr key={ix}>
                                         <td><Link to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.usuario}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
                                         <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
                                         <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
                                         <td><Link to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
+                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
                                     </tr>
                                 )
                             }
@@ -79,7 +81,8 @@ const ClienteLogado = () => {
                     </tbody>
                 </table>
                 </section>
-                <section className='container d-flex justify-content-center'>
+                <section className='container d-flex justify-content-around'>
+                    <button className='btn btn-secondary mt-3' onClick={BuscarTickets} >Atualizar</button>
                     <button onClick={Loggout} className="btn btn-danger mt-3">Sair</button>
                 </section>
             </div>
@@ -120,12 +123,12 @@ export function NovoTicket () {
 
     function AlteraAssunto(assunto) {
         BuscaContador()
-        setTicket({assunto: assunto.target.value, descricao: `${ticket.descricao}`, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1 , dtAbertura: dataHora(), dtConclusao: "", operador: ""})
+        setTicket({assunto: assunto.target.value, descricao: `${ticket.descricao}`, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1 , dtAbertura: dataHora(), dtConclusao: "", operador: "", resposta: ""})
     }
     
     function AlteraDescricao(descricao) {
         BuscaContador()
-        setTicket({assunto: `${ticket.assunto}`, descricao: descricao.target.value, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1, dtAbertura: dataHora(), dtConclusao: "", operador: ""})
+        setTicket({assunto: `${ticket.assunto}`, descricao: descricao.target.value, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length +1, dtAbertura: dataHora(), dtConclusao: "", operador: "", resposta: ""})
     }
 
     const dataHora = () => {
