@@ -6,10 +6,13 @@ const Home = () => {
         <div className="container mt-5">
             <div className="card shadow">
                 <div className="card-header text-center">
-                    <h2>Escolha o seu perfil</h2>
+                    <h2>Login | Ticket-Suporte</h2>
                 </div>
                 <div className="card-body">
                     <table className="container">
+                        <tbody className="text-center">
+                            <p>Escolha o seu perfil</p>
+                        </tbody>
                         <tbody>
                             <tr className="d-flex justify-content-around">
                                 <td>

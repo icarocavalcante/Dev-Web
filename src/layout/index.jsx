@@ -48,7 +48,7 @@ const Layout = () => {
                     <div className="container">
                         <nav className="navbar bg-light navbar-expand-lg">
                             <div className="container-fluid">
-                                <Link className="navbar-brand" to='/'>Sistema de Suporte</Link>
+                                <Link className="navbar-brand" to='/'>Home</Link>
                             </div>
                         </nav>
                     </div>
