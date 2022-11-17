@@ -71,19 +71,6 @@ const Suporte = () => {
                 {loading && <div className="container">Carregando ...</div>}
 
             </section>
-            {/* <table className="table table-striped">
-                <tbody>
-                    {dbSuporte.map((el, ix) => {
-                        return(
-                            <tr key={ix}>
-                                <td>{el[1].usuario}</td>
-                                <td>{el[1].senha}</td>
-                            </tr>
-                        )
-                        })
-                    }
-                </tbody>
-                </table> */}
         </div>
     )
 }

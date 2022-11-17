@@ -36,7 +36,7 @@ const ClienteLogado = () => {
     return (
         <div className='container'>
             {clienteAutenticado &&
-                <h1>Cliente: {`${atualCliente}`}</h1>
+                <h1>Bem vindo, {`${atualCliente}`}</h1>
             }
             <div className="container">
                 <nav className='my-3 navbar bg-light container-fluid'>
@@ -65,16 +65,31 @@ const ClienteLogado = () => {
                     <tbody>
                         {tickets.map((el, ix) => {
                             if (el.usuario === atualCliente) {
-                                return (
-                                    <tr key={ix}>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
-                                        <td><Link to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
-                                    </tr>
-                                )
+                                if (el.status === "Em aberto"){
+                                    return (
+                                        <tr key={ix}>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
+                                            <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                        </tr>
+                                    )
+                                    
+                                } else if (el.status === "Concluído") {
+                                    return (
+                                        <tr key={ix}>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
+                                            <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                        </tr>
+                                    )
+
+                                }
                             }
                         })
                         }
@@ -98,6 +113,10 @@ export function NovoTicket () {
         e.preventDefault()
         
         axios
+        .post(`${FIREBASE_URL}/contador.json`, ticket)
+        .catch((err) => alert(err))
+        
+        axios
         .post(`${FIREBASE_URL}/tickets.json`, ticket)
         .then(() => {
             alert(`Ticket criado. ID: ${ticket.id}`)
@@ -111,7 +130,7 @@ export function NovoTicket () {
     
     function BuscaContador() {
         axios
-            .get(`${FIREBASE_URL}/tickets.json`)
+            .get(`${FIREBASE_URL}/contador.json`)
             .then(({data, status}) => {
                 if (status === 200) {
                     const d = Object.entries(data).map((key, value) => { return {...value} })
@@ -120,6 +139,7 @@ export function NovoTicket () {
             })
             .catch((err) => alert(err))
     }
+
 
     function AlteraAssunto(assunto) {
         BuscaContador()
@@ -136,9 +156,9 @@ export function NovoTicket () {
         let dataHora = time.toLocaleString()
         return dataHora
     }
-
-
-
+    
+    
+    
     return (
         <div className="container">
             <section>
@@ -162,7 +182,7 @@ export function NovoTicket () {
     )
 }
 
-export function Tickets () {
+export function ClienteTickets () {
     const {clienteAutenticado, atualCliente, ticket, setTicket} = useContext(Context)
     const { key } = useParams()
 
