@@ -5,10 +5,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import Home from './pages/home'
 import Layout from './layout';
-import { Cliente, NovoCliente } from './pages/login/cliente';
-import ClienteLogado, { NovoTicket, ClienteTickets } from './pages/login/cliente/Logado';
-import Suporte from './pages/login/suporte';
-import { SuporteLogado, SuporteTickets } from './pages/login/suporte/logado';
+import { Cliente, NovoCliente, ClienteLogado, NovoTicket, ClienteTickets } from './pages/cliente';
+import { Suporte, SuporteLogado, SuporteTickets } from './pages/suporte';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -33,7 +31,7 @@ root.render(
               <Route path='logado' >
                 <Route path='' element={<SuporteLogado />} />
                 <Route path=':key' element={<SuporteTickets />} />
-            </Route>
+              </Route>
             </Route>
           </Route>
         </Route>

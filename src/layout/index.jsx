@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { Link, Outlet } from "react-router-dom"
 import Context from "../context"
+import logo from '../img/suporte.png'
 
 
 const Layout = () => {
-    
+
     const [clienteAutenticado, setClienteAutenticado] = useState()
     const [suporteAutenticado, setSuporteAutenticado] = useState()
     const [atualCliente, setAtualCliente] = useState()
@@ -24,36 +25,33 @@ const Layout = () => {
     const [contador, setContador] = useState([])
 
     return (
-        <Context.Provider value={{atualCliente,
-        setAtualCliente,
-        atualSuporte,
-        setAtualSuporte,
-        clienteAutenticado,
-        setClienteAutenticado,
-        suporteAutenticado,
-        setSuporteAutenticado,
-        ticket,
-        setTicket,
-        defaultTicket,
-        setDefaultTicket,
-        tickets,
-        setTickets,
-        contador,
-        setContador
-        }}>
+        <Context.Provider
+            value={{
+                atualCliente, setAtualCliente,
+                atualSuporte, setAtualSuporte,
+                clienteAutenticado, setClienteAutenticado,
+                suporteAutenticado, setSuporteAutenticado,
+                ticket, setTicket,
+                defaultTicket, setDefaultTicket,
+                tickets, setTickets,
+                contador, setContador
+            }}
+        >
 
-            <div className="d-flex flex-column vh-100" style={{flex: 1}}>
-                
+            <div className="d-flex flex-column vh-100" style={{ flex: 1 }}>
+
                 <header>
                     <div className="container">
                         <nav className="navbar bg-light navbar-expand-lg">
                             <div className="container-fluid">
-                                <Link className="navbar-brand" to='/'>Home</Link>
+                                <Link className="navbar-brand" to='/'>
+                                    <img src={logo} width="42px" alt="Logo Suporte" />
+                                </Link>
                             </div>
                         </nav>
                     </div>
                 </header>
-                
+
                 <main>
                     <div className="container">
                         <Outlet />
@@ -66,9 +64,9 @@ const Layout = () => {
                         <p>&copy; 2022 - Estacio</p>
                     </div>
                 </footer>
-            </div> 
+            </div>
         </Context.Provider>
-        )
-    }
+    )
+}
 
 export default Layout

@@ -1,15 +1,93 @@
-import axios from 'axios'
-import { FIREBASE_URL } from '../../../../constants'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useContext, useEffect } from 'react'
-import Context from '../../../../context'
-import DbConn from '../../../../database/dbconn'
+import axios from "axios"
+import { useContext, useEffect, useState } from "react"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { FIREBASE_URL } from '../constants'
+import Context from "../context"
+import DbConn from '../database/dbconn'
 import { ref, get, child, set } from 'firebase/database'
 
-const SuporteLogado = () => {
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, tickets, setTickets } = useContext(Context)
-    const redirecionar = useNavigate()
 
+const dataHora = () => {
+    let time = new Date()
+    let dataHora = time.toLocaleString()
+    return dataHora
+}
+
+function Suporte() {
+    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
+    const [suporte, setSuporte] = useState({ usuario: "", senha: "" })
+    const [dbSuporte, setDbSuporte] = useState([])
+    const [loading, setLoading] = useState(false)
+    const redirecionar = useNavigate()
+    
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setLoading(true)
+
+        axios
+            .get(`${FIREBASE_URL}/suporte.json`)
+            .then(({ data, status }) => {
+                if (status === 200) {
+                    const retorno = Object
+                        .entries(data)
+                    setDbSuporte(retorno)
+                } else {
+                    setDbSuporte([])
+                }
+            })
+            .catch((err) => alert(err))
+            .finally(() => {
+                setLoading(false)
+            })
+
+    }
+
+    useEffect(() => {
+        setSuporteAutenticado(false)
+        for (let index = 0; index < dbSuporte.length; index++) {
+            if (dbSuporte[index][1].usuario === suporte.usuario && dbSuporte[index][1].senha === suporte.senha) {
+                setAtualSuporte(`${suporte.usuario}`)
+                setSuporteAutenticado(true)
+            }
+        }
+    }, [dbSuporte, suporte.senha, suporte.usuario, setSuporteAutenticado])
+
+    useEffect(() => {
+        if (suporteAutenticado) {
+            alert(`Bem vindo(a), ${atualSuporte}`)
+            redirecionar('/login/suporte/logado')
+        }
+    }, [suporteAutenticado, suporte.usuario, redirecionar])
+
+    return (
+        <div className="container d-flex justify-content-center">
+            <section className="card w-50 shadow my-5 text-center d-flex flex-column">
+                <h4>Login - Suporte</h4>
+                <form action="" method="post" className="form" onSubmit={handleSubmit}>
+                    <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
+                        <label htmlFor="txtUsuario" className="form-label col-2">Usuário</label>
+                        <input type="text" className="form-control" id="txtUsuario" onChange={({ target: { value } }) => setSuporte({ ...suporte, usuario: value })} />
+                    </div>
+                    <div className="form-row d-flex flex-row align-items-center mb-2 container-fluid">
+                        <label htmlFor="pwdSenha" className="form-label col-2">Senha</label>
+                        <input type="password" className="form-control" id="pwdSenha" onChange={({ target: { value } }) => setSuporte({ ...suporte, senha: value })} />
+                    </div>
+                    <div className="container d-flex flex-row justify-content-around">
+                        <input type="submit" className="btn btn-primary mb-3" value="Acessar" />
+                        <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
+                    </div>
+                </form>
+                {loading && <div className="container">Carregando ...</div>}
+
+            </section>
+        </div>
+    )
+}
+
+function SuporteLogado() {
+    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
+    const redirecionar = useNavigate()
+    
     async function BuscarTickets() {
         if (suporteAutenticado) {
             axios
@@ -94,15 +172,9 @@ const SuporteLogado = () => {
 }
 
 function SuporteTickets() {
-    const { suporteAutenticado, atualSuporte, ticket, setTicket } = useContext(Context)
     const { key } = useParams()
     const redirecionar = useNavigate()
-
-    const dataHora = () => {
-        let time = new Date()
-        let dataHora = time.toLocaleString()
-        return dataHora
-    }
+    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
 
     useEffect(function RecuperaTickets() {
         if (key) {
@@ -124,16 +196,16 @@ function SuporteTickets() {
     }, [key])
 
     function AlterarResposta(resposta) {
-        setTicket({...ticket, resposta: resposta.target.value})
+        setTicket({ ...ticket, resposta: resposta.target.value })
         SalvarTicket()
     }
-    
+
     function SalvarTicket() {
-        setTicket({assunto: ticket.assunto, descricao: ticket.descricao, usuario: ticket.usuario, status: "Concluído", id: ticket.id, dtAbertura: ticket.dtAbertura, dtConclusao: dataHora(), operador: atualSuporte, resposta: ticket.resposta})
+        setTicket({ assunto: ticket.assunto, descricao: ticket.descricao, usuario: ticket.usuario, status: "Concluído", id: ticket.id, dtAbertura: ticket.dtAbertura, dtConclusao: dataHora(), operador: atualSuporte, resposta: ticket.resposta })
         console.log("alterado")
     }
-    
-    function ConcluirTicket(){
+
+    function ConcluirTicket() {
         const db = DbConn()
         const posts = ref(db)
         set(child(posts, `tickets/${key}`), ticket).then(() => console.log("Salvo")).catch((err) => alert(err))
@@ -205,4 +277,4 @@ function SuporteTickets() {
     )
 }
 
-export { SuporteLogado, SuporteTickets }
+export { Suporte, SuporteLogado, SuporteTickets }
