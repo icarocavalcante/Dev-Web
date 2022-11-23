@@ -14,7 +14,7 @@ const dataHora = () => {
 }
 
 function Suporte() {
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
+    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte } = useContext(Context)
     const [suporte, setSuporte] = useState({ usuario: "", senha: "" })
     const [dbSuporte, setDbSuporte] = useState([])
     const [loading, setLoading] = useState(false)
@@ -85,7 +85,7 @@ function Suporte() {
 }
 
 function SuporteLogado() {
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
+    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, tickets, setTickets } = useContext(Context)
     const redirecionar = useNavigate()
     
     async function BuscarTickets() {
@@ -174,7 +174,7 @@ function SuporteLogado() {
 function SuporteTickets() {
     const { key } = useParams()
     const redirecionar = useNavigate()
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte, tickets, setTickets, ticket, setTicket } = useContext(Context)
+    const { suporteAutenticado, atualSuporte, ticket, setTicket } = useContext(Context)
 
     useEffect(function RecuperaTickets() {
         if (key) {

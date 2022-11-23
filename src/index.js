@@ -16,22 +16,20 @@ root.render(
         <Route path='/' element={<Layout />}>
           <Route path='/' element={<Navigate to='/home' />} />
           <Route path='home' element={<Home />} />
-          <Route path='login'>
-            <Route path='cliente'>
-              <Route path='' element={<Cliente />} />
-              <Route path='new' element={<NovoCliente />} />
-              <Route path='logado' >
-                <Route path='' element={<ClienteLogado />} />
-                <Route path='new' element={<NovoTicket />} />
-                <Route path=':key' element={<ClienteTickets />} />
-              </Route>
+          <Route path='cliente'>
+            <Route path='' element={<Cliente />} />
+            <Route path='new' element={<NovoCliente />} />
+            <Route path='logado' >
+              <Route path='' element={<ClienteLogado />} />
+              <Route path='new' element={<NovoTicket />} />
+              <Route path=':key' element={<ClienteTickets />} />
             </Route>
-            <Route path='suporte'>
-              <Route path='' element={<Suporte />} />
-              <Route path='logado' >
-                <Route path='' element={<SuporteLogado />} />
-                <Route path=':key' element={<SuporteTickets />} />
-              </Route>
+          </Route>
+          <Route path='suporte'>
+            <Route path='' element={<Suporte />} />
+            <Route path='logado' >
+              <Route path='' element={<SuporteLogado />} />
+              <Route path=':key' element={<SuporteTickets />} />
             </Route>
           </Route>
         </Route>

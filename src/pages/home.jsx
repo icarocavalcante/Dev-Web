@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 const Home = () => {
 
-    return(
+    return (
         <div className="container mt-5">
             <div className="card shadow">
                 <div className="card-header text-center">
@@ -11,15 +11,17 @@ const Home = () => {
                 <div className="card-body">
                     <table className="container">
                         <tbody className="text-center">
-                            <p>Escolha o seu perfil</p>
+                            <tr>
+                                <td>Escolha o seu perfil</td>
+                            </tr>
                         </tbody>
                         <tbody>
                             <tr className="d-flex justify-content-around">
                                 <td>
-                                    <Link className="btn btn-primary" to='/login/cliente'>Cliente</Link>
+                                    <Link className="btn btn-primary" to='/cliente'>Cliente</Link>
                                 </td>
                                 <td>
-                                    <Link className="btn btn-primary" to='/login/suporte'>Suporte</Link>
+                                    <Link className="btn btn-primary" to='/suporte'>Suporte</Link>
                                 </td>
                             </tr>
                         </tbody>

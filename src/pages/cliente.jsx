@@ -8,22 +8,18 @@ function Cliente() {
     const [cliente, setCliente] = useState({ usuario: "", senha: "" })
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
-    const { clienteAutenticado, setClienteAutenticado, atualCliente, setAtualCliente } = useContext(Context)
+    const { setAutenticado, setUser } = useContext(Context)
     const redirecionar = useNavigate()
 
-    const handleSubmit = (e) => {
+    function handleSubmit(e) {
         e.preventDefault()
         setLoading(true)
-
         axios
             .get(`${FIREBASE_URL}/cliente.json`)
             .then(({ data, status }) => {
                 if (status === 200) {
-                    const retorno = Object
-                        .entries(data)
+                    let retorno = Object.entries(data).map(([key, value]) => { return value })
                     setDbCliente(retorno)
-                } else {
-                    setDbCliente([])
                 }
             })
             .catch((err) => alert(err))
@@ -34,21 +30,15 @@ function Cliente() {
     }
 
     useEffect(() => {
-        setClienteAutenticado(false)
         for (let index = 0; index < dbCliente.length; index++) {
-            if (dbCliente[index][1].usuario === cliente.usuario && dbCliente[index][1].senha === cliente.senha) {
-                setAtualCliente(`${cliente.usuario}`)
-                setClienteAutenticado(true)
+            if (dbCliente[index].usuario === cliente.usuario && dbCliente[index].senha === cliente.senha) {
+                setUser(dbCliente[index].nome)
+                setAutenticado(true)
+                alert(`Bem vindo(a), ${dbCliente[index].nome}`)
+                redirecionar('/cliente/logado')
             }
         }
-    }, [dbCliente, cliente.usuario, cliente.senha, setClienteAutenticado])
-
-    useEffect(() => {
-        if (clienteAutenticado) {
-            alert(`Bem vindo(a), ${atualCliente}`)
-            redirecionar('/login/cliente/logado')
-        }
-    }, [clienteAutenticado, cliente.usuario, redirecionar])
+    }, [dbCliente])
 
     return (
         <div className="container d-flex justify-content-center">
@@ -65,7 +55,7 @@ function Cliente() {
                     </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Acessar" />
-                        <Link to="/login/cliente/new" className="btn btn-secondary mb-3">Novo Usuário</Link>
+                        <Link to="/cliente/new" className="btn btn-secondary mb-3">Novo Usuário</Link>
                         <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
@@ -76,26 +66,18 @@ function Cliente() {
 }
 
 function NovoCliente() {
-    const [cliente, setCliente] = useState({ usuario: "", senha: "" })
+    const [cliente, setCliente] = useState()
     const [loading, setLoading] = useState(false)
-    const [novoUsuario, setNovoUsuario] = useState(true)
-    const [dbUsuario, setDbUsuario] = useState("")
+    const [novoUsuario, setNovoUsuario] = useState()
+    const [dbUsuario, setDbUsuario] = useState()
     const redirecionar = useNavigate()
 
+    const [formPreenchido, setFormPreenchido] = useState()
+
     useEffect(() => {
-        axios
-            .get(`${FIREBASE_URL}/cliente.json`)
-            .then(({ data, status }) => {
-                if (status === 200) {
-                    const retorno = Object
-                        .entries(data)
-                    setDbUsuario(retorno)
-                } else {
-                    setDbUsuario([])
-                }
-            })
-            .catch((err) => alert(err))
-    }, [cliente.usuario])
+        setFormPreenchido(false)
+        setNovoUsuario(true)
+    }, [])
 
     useEffect(() => {
         for (let index = 0; index < dbUsuario.length; index++) {
@@ -103,26 +85,35 @@ function NovoCliente() {
                 setNovoUsuario(false)
             }
         }
-    }, [cliente.usuario, dbUsuario])
+        if (!novoUsuario) {
+            alert("Usuário já existe.")
+            setNovoUsuario(true)
+        }
+    }, [dbUsuario])
 
     const handleSubmit = (e) => {
         e.preventDefault()
         setLoading(true)
-        if (!novoUsuario) {
-            alert("Usuário já existe.")
-            setLoading(false)
-        } else {
-            axios
-                .post(`${FIREBASE_URL}/cliente.json`, cliente)
-                .then(({ data }) => {
-                    alert(`Cadastro bem sucedido. Salve o ID: ${data.name}`)
-                    redirecionar('/cliente')
-                })
-                .catch((err) => alert(err))
-                .finally(() => {
-                    setLoading(false)
-                })
-        }
+        axios
+            .get(`${FIREBASE_URL}/cliente.json`)
+            .then(({ data, status }) => {
+                if (status === 200) {
+                    const retorno = Object
+                        .entries(data)
+                    setDbUsuario(retorno)
+                }
+            })
+            .catch((err) => alert(err))
+        axios
+            .post(`${FIREBASE_URL}/cliente.json`, cliente)
+            .then(({ data }) => {
+                alert(`Cadastro bem sucedido.`)
+                redirecionar('/cliente')
+            })
+            .catch((err) => alert(err))
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
 
@@ -132,12 +123,20 @@ function NovoCliente() {
                 <h4>Novo Cadastro</h4>
                 <form action="" method="post" className="form" onSubmit={handleSubmit}>
                     <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
+                        <label htmlFor="txtNome" className="form-label col-2">Nome</label>
+                        <input type="text" className="form-control" id="txtNome" placeholder="Digite seu nome" onChange={({ target: { value } }) => setCliente({ ...cliente, nome: value })} />
+                    </div>
+                    <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
                         <label htmlFor="txtUsuario" className="form-label col-2">Usuário</label>
-                        <input type="text" className="form-control" id="txtUsuario" onChange={({ target: { value } }) => setCliente({ ...cliente, usuario: value })} />
+                        <input type="text" className="form-control" id="txtUsuario" placeholder="Digite seu usuário" onChange={({ target: { value } }) => setCliente({ ...cliente, usuario: value })} />
                     </div>
                     <div className="form-row d-flex flex-row align-items-center mb-2 container-fluid">
                         <label htmlFor="pwdSenha" className="form-label col-2">Senha</label>
-                        <input type="password" className="form-control" id="pwdSenha" onChange={({ target: { value } }) => setCliente({ ...cliente, senha: value })} />
+                        <input type="password" className="form-control" id="pwdSenha" placeholder="Digite sua senha" onChange={({ target: { value } }) => setCliente({ ...cliente, senha: value })} />
+                    </div>
+                    <div className="form-row d-flex flex-row align-items-center mb-2 container-fluid">
+                        <label htmlFor="pwdConfirmaSenha" className="form-label col-2">Corfirme Senha</label>
+                        <input type="password" className="form-control" id="pwdConfirmaSenha" placeholder="Confirme sua senha" onChange={({ target: { value } }) => setCliente({ ...cliente, confirmaSenha: value })} />
                     </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Cadastrar" />
@@ -151,11 +150,11 @@ function NovoCliente() {
 }
 
 function ClienteLogado() {
-    const { clienteAutenticado, setClienteAutenticado, atualCliente, tickets, setTickets } = useContext(Context)
+    const { autenticado, setAutenticado, user, setUser, tickets, setTickets } = useContext(Context)
     const redirecionar = useNavigate()
 
-    async function BuscarTickets() {
-        if (clienteAutenticado) {
+    function BuscarTickets() {
+        if (autenticado) {
             axios
                 .get(`${FIREBASE_URL}/tickets.json`)
                 .then(({ data, status }) => {
@@ -167,29 +166,30 @@ function ClienteLogado() {
                     }
                 })
                 .catch((err) => alert(err))
-                .finally(() => setClienteAutenticado(true))
+                .finally(() => setAutenticado(true))
         }
     }
 
     function Loggout() {
-        setClienteAutenticado(false)
-        alert(`Volte sempre, ${atualCliente}`)
-        redirecionar('/')
+        setAutenticado(false)
+        setUser("")
+        alert(`Volte sempre, ${user}`)
+        redirecionar('/cliente')
     }
 
-    useEffect(() => BuscarTickets, [clienteAutenticado])
+    useEffect(() => BuscarTickets, [])
 
     return (
         <div className='container'>
-            {clienteAutenticado &&
-                <h1>Bem vindo, {`${atualCliente}`}</h1>
+            {autenticado &&
+                <h1>Bem vindo, {`${user}`}</h1>
             }
             <div className="container">
                 <nav className='my-3 navbar bg-light container-fluid'>
                     <table>
                         <thead>
                             <tr>
-                                <td><Link to='/login/cliente/logado/new' className='navbar-brand'>Novo Ticket</Link></td>
+                                <td><Link to='/cliente/logado/new' className='navbar-brand'>Novo Ticket</Link></td>
                                 <td></td>
                             </tr>
                         </thead>
@@ -210,7 +210,7 @@ function ClienteLogado() {
                         </thead>
                         <tbody>
                             {tickets.map((el, ix) => {
-                                if (el.usuario === atualCliente) {
+                                if (el.usuario === user) {
                                     if (el.status === "Em aberto") {
                                         return (
                                             <tr key={ix}>
@@ -252,58 +252,55 @@ function ClienteLogado() {
 }
 
 function NovoTicket() {
-    const { ticket, setTicket, atualCliente, defaultTicket, contador, setContador } = useContext(Context)
+    const { ticket, setTicket, user } = useContext(Context)
     const redirecionar = useNavigate()
+    const [defaultTicket, setDefaultTicket] = useState({
+        id: "",
+        usuario: "",
+        status: "",
+        dtAbertura: "",
+        dtConclusao: "",
+        assunto: "",
+        descricao: "",
+        operador: "",
+    })
 
     function handleSubmitForm(e) {
         e.preventDefault()
-
-        axios
-            .post(`${FIREBASE_URL}/contador.json`, ticket)
-            .catch((err) => alert(err))
-
         axios
             .post(`${FIREBASE_URL}/tickets.json`, ticket)
             .then(() => {
                 alert(`Ticket criado. ID: ${ticket.id}`)
-                redirecionar('/login/cliente/logado')
+                setTicket(defaultTicket)
+                redirecionar('/cliente/logado')
             })
             .catch((err) => alert(err))
-            .finally(() => {
-                setTicket(defaultTicket)
-            })
     }
 
-    function BuscaContador() {
+    useEffect(() => {
+        setTicket(defaultTicket);
         axios
-            .get(`${FIREBASE_URL}/contador.json`)
+            .get(`${FIREBASE_URL}/tickets.json`)
             .then(({ data, status }) => {
                 if (status === 200) {
-                    const d = Object.entries(data).map((key, value) => { return { ...value } })
-                    setContador(d)
+                    const d = Object.entries(data)
+                    let time = new Date();
+                    let agora = time.toLocaleString();
+                    setTicket({
+                        ...ticket,
+                        id: d.length+1,
+                        usuario: user,
+                        status: "Em aberto",
+                        dtConclusao: "",
+                        assunto: "",
+                        descricao: "",
+                        operador: "",
+                        dtAbertura: agora
+                    })
                 }
             })
             .catch((err) => alert(err))
-    }
-
-
-    function AlteraAssunto(assunto) {
-        BuscaContador()
-        setTicket({ assunto: assunto.target.value, descricao: `${ticket.descricao}`, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length + 1, dtAbertura: dataHora(), dtConclusao: "", operador: "", resposta: "" })
-    }
-
-    function AlteraDescricao(descricao) {
-        BuscaContador()
-        setTicket({ assunto: `${ticket.assunto}`, descricao: descricao.target.value, usuario: `${atualCliente}`, status: "Em aberto", id: contador.length + 1, dtAbertura: dataHora(), dtConclusao: "", operador: "", resposta: "" })
-    }
-
-    const dataHora = () => {
-        let time = new Date()
-        let dataHora = time.toLocaleString()
-        return dataHora
-    }
-
-
+    }, [])
 
     return (
         <div className="container">
@@ -312,15 +309,15 @@ function NovoTicket() {
                 <form method="post" onSubmit={handleSubmitForm} >
                     <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
                         <label htmlFor="txtAssunto" className="form-label col-2">Assunto</label>
-                        <input type="text" className="form-control" id="txtAssunto" onChange={AlteraAssunto} />
+                        <input type="text" className="form-control" id="txtAssunto" onChange={({ target: { value } }) => setTicket({ ...ticket, assunto: value })} />
                     </div>
                     <div className="form-row d-flex flex-row align-items-center my-3 container-fluid">
                         <label htmlFor="txtDescricao" className="form-label col-2">Descricao</label>
-                        <textarea rows={5} className="form-control" id="txtDescricao" onChange={AlteraDescricao} />
+                        <textarea rows={5} className="form-control" id="txtDescricao" onChange={({ target: { value } }) => setTicket({ ...ticket, descricao: value })} />
                     </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Cadastrar" />
-                        <Link to="/login/cliente/logado" className="btn btn-danger mb-3">Voltar</Link>
+                        <Link to="/cliente/logado" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
             </section>
