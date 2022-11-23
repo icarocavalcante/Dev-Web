@@ -69,44 +69,50 @@ function NovoCliente() {
     const [cliente, setCliente] = useState()
     const [loading, setLoading] = useState(false)
     const [novoUsuario, setNovoUsuario] = useState()
-    const [dbUsuario, setDbUsuario] = useState()
+    const [dbUsuarios, setDbUsuarios] = useState()
     const redirecionar = useNavigate()
 
-    const [formPreenchido, setFormPreenchido] = useState()
-
     useEffect(() => {
-        setFormPreenchido(false)
         setNovoUsuario(true)
-    }, [])
-
-    useEffect(() => {
-        for (let index = 0; index < dbUsuario.length; index++) {
-            if (dbUsuario[index][1].usuario === cliente.usuario) {
-                setNovoUsuario(false)
-            }
-        }
-        if (!novoUsuario) {
-            alert("Usuário já existe.")
-            setNovoUsuario(true)
-        }
-    }, [dbUsuario])
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        setLoading(true)
         axios
             .get(`${FIREBASE_URL}/cliente.json`)
             .then(({ data, status }) => {
                 if (status === 200) {
-                    const retorno = Object
-                        .entries(data)
-                    setDbUsuario(retorno)
+                    const retorno = Object.entries(data).map(([key, value]) => {return value})
+                    setDbUsuarios(retorno)
+                    setCliente({...cliente, id: retorno.length+1})
                 }
             })
             .catch((err) => alert(err))
-        axios
+    }, [])
+
+    useEffect(() => {
+        if (dbUsuarios){
+            let tamanho = dbUsuarios.length
+            let contador = 0
+            for (let index = 0; index < tamanho; index++) {
+                if (dbUsuarios[index].usuario === cliente.usuario) {
+                    contador++
+                }
+            }
+            if (contador){
+                setNovoUsuario(false)
+            } else {
+                setNovoUsuario(true)
+            }
+        }
+    }, [cliente])
+    
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setLoading(true)
+        if (!novoUsuario) {
+            alert("Usuário já existe.")
+            setLoading(false)
+        } else if (cliente.usuario && cliente.senha && cliente.nome) {
+            axios
             .post(`${FIREBASE_URL}/cliente.json`, cliente)
-            .then(({ data }) => {
+            .then(() => {
                 alert(`Cadastro bem sucedido.`)
                 redirecionar('/cliente')
             })
@@ -114,8 +120,10 @@ function NovoCliente() {
             .finally(() => {
                 setLoading(false)
             })
+        } else {
+            alert("Preencha todos os campos do formulário.")
+        }
     }
-
 
     return (
         <div className="container d-flex justify-content-center">
@@ -134,13 +142,9 @@ function NovoCliente() {
                         <label htmlFor="pwdSenha" className="form-label col-2">Senha</label>
                         <input type="password" className="form-control" id="pwdSenha" placeholder="Digite sua senha" onChange={({ target: { value } }) => setCliente({ ...cliente, senha: value })} />
                     </div>
-                    <div className="form-row d-flex flex-row align-items-center mb-2 container-fluid">
-                        <label htmlFor="pwdConfirmaSenha" className="form-label col-2">Corfirme Senha</label>
-                        <input type="password" className="form-control" id="pwdConfirmaSenha" placeholder="Confirme sua senha" onChange={({ target: { value } }) => setCliente({ ...cliente, confirmaSenha: value })} />
-                    </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Cadastrar" />
-                        <Link to="/login/cliente" className="btn btn-danger mb-3">Voltar</Link>
+                        <Link to="/cliente" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
                 {loading && <div className="container">Carregando ...</div>}
@@ -214,24 +218,24 @@ function ClienteLogado() {
                                     if (el.status === "Em aberto") {
                                         return (
                                             <tr key={ix}>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
-                                                <td><Link className='text-danger' to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.id}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.operador}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.status}</Link></td>
                                             </tr>
                                         )
 
                                     } else if (el.status === "Concluído") {
                                         return (
                                             <tr key={ix}>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.operador}</Link></td>
-                                                <td><Link className='text-success' to={`/login/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.id}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.operador}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.status}</Link></td>
                                             </tr>
                                         )
 
@@ -387,7 +391,7 @@ function ClienteTickets() {
                     <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`} />
                 </section>
                 <section className='container d-flex justify-content-center'>
-                    <Link to="/login/cliente/logado" className="btn btn-danger mt-3">Voltar</Link>
+                    <Link to="/cliente/logado" className="btn btn-danger mt-3">Voltar</Link>
                 </section>
             </div>
         </div>
