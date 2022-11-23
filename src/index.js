@@ -19,7 +19,7 @@ root.render(
           <Route path='cliente'>
             <Route path='' element={<Cliente />} />
             <Route path='new' element={<NovoCliente />} />
-            <Route path='logado' >
+            <Route path='autenticado' >
               <Route path='' element={<ClienteLogado />} />
               <Route path='new' element={<NovoTicket />} />
               <Route path=':key' element={<ClienteTickets />} />

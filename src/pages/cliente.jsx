@@ -8,7 +8,7 @@ function Cliente() {
     const [cliente, setCliente] = useState({ usuario: "", senha: "" })
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
-    const { setAutenticado, setUser } = useContext(Context)
+    const { setAutenticado, autenticado, setUser } = useContext(Context)
     const redirecionar = useNavigate()
 
     function handleSubmit(e) {
@@ -32,10 +32,10 @@ function Cliente() {
     useEffect(() => {
         for (let index = 0; index < dbCliente.length; index++) {
             if (dbCliente[index].usuario === cliente.usuario && dbCliente[index].senha === cliente.senha) {
-                setUser(dbCliente[index].nome)
+                setUser(dbCliente[index])
                 setAutenticado(true)
                 alert(`Bem vindo(a), ${dbCliente[index].nome}`)
-                redirecionar('/cliente/logado')
+                redirecionar(`/cliente/autenticado`)
             }
         }
     }, [dbCliente])
@@ -154,8 +154,8 @@ function NovoCliente() {
 }
 
 function ClienteLogado() {
-    const { autenticado, setAutenticado, user, setUser, tickets, setTickets } = useContext(Context)
-    const redirecionar = useNavigate()
+    const { autenticado, setAutenticado, user, setUser, tickets, setTickets } = useContext(Context);
+    const redirecionar = useNavigate();
 
     function BuscarTickets() {
         if (autenticado) {
@@ -170,14 +170,15 @@ function ClienteLogado() {
                     }
                 })
                 .catch((err) => alert(err))
-                .finally(() => setAutenticado(true))
+        } else {
+            redirecionar('/cliente')
         }
     }
 
     function Loggout() {
         setAutenticado(false)
         setUser("")
-        alert(`Volte sempre, ${user}`)
+        alert(`Volte sempre, ${user.nome}`)
         redirecionar('/cliente')
     }
 
@@ -186,14 +187,14 @@ function ClienteLogado() {
     return (
         <div className='container'>
             {autenticado &&
-                <h1>Bem vindo, {`${user}`}</h1>
+                <h1>Bem vindo, {`${user.nome}`}</h1>
             }
             <div className="container">
                 <nav className='my-3 navbar bg-light container-fluid'>
                     <table>
                         <thead>
                             <tr>
-                                <td><Link to='/cliente/logado/new' className='navbar-brand'>Novo Ticket</Link></td>
+                                <td><Link to={`/cliente/autenticado/new`} className='navbar-brand'>Novo Ticket</Link></td>
                                 <td></td>
                             </tr>
                         </thead>
@@ -214,28 +215,28 @@ function ClienteLogado() {
                         </thead>
                         <tbody>
                             {tickets.map((el, ix) => {
-                                if (el.usuario === user) {
+                                if (el.usuario === user.usuario) {
                                     if (el.status === "Em aberto") {
                                         return (
                                             <tr key={ix}>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.operador}</Link></td>
-                                                <td><Link className='text-danger' to={`/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.id}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.assunto}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.operador}</Link></td>
+                                                <td><Link className='text-danger' to={`/cliente/autenticado/${el.key}`}>{el.status}</Link></td>
                                             </tr>
                                         )
 
                                     } else if (el.status === "Concluído") {
                                         return (
                                             <tr key={ix}>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.id}</Link></td>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.assunto}</Link></td>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.operador}</Link></td>
-                                                <td><Link className='text-success' to={`/cliente/logado/${el.key}`}>{el.status}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.id}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.assunto}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.operador}</Link></td>
+                                                <td><Link className='text-success' to={`/cliente/autenticado/${el.key}`}>{el.status}</Link></td>
                                             </tr>
                                         )
 
@@ -276,7 +277,7 @@ function NovoTicket() {
             .then(() => {
                 alert(`Ticket criado. ID: ${ticket.id}`)
                 setTicket(defaultTicket)
-                redirecionar('/cliente/logado')
+                redirecionar(`/cliente/autenticado`)
             })
             .catch((err) => alert(err))
     }
@@ -293,7 +294,7 @@ function NovoTicket() {
                     setTicket({
                         ...ticket,
                         id: d.length+1,
-                        usuario: user,
+                        usuario: user.usuario,
                         status: "Em aberto",
                         dtConclusao: "",
                         assunto: "",
@@ -321,7 +322,7 @@ function NovoTicket() {
                     </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Cadastrar" />
-                        <Link to="/cliente/logado" className="btn btn-danger mb-3">Voltar</Link>
+                        <Link to={`/cliente/autenticado`} className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
             </section>
@@ -330,7 +331,7 @@ function NovoTicket() {
 }
 
 function ClienteTickets() {
-    const { clienteAutenticado, atualCliente, ticket, setTicket } = useContext(Context)
+    const { clienteAutenticado, atualCliente, ticket, setTicket, user } = useContext(Context)
     const { key } = useParams()
 
     useEffect(() => {
@@ -391,7 +392,7 @@ function ClienteTickets() {
                     <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`} />
                 </section>
                 <section className='container d-flex justify-content-center'>
-                    <Link to="/cliente/logado" className="btn btn-danger mt-3">Voltar</Link>
+                    <Link to={`/cliente/autenticado`} className="btn btn-danger mt-3">Voltar</Link>
                 </section>
             </div>
         </div>
