@@ -8,17 +8,20 @@ function Cliente() {
     const [cliente, setCliente] = useState({ usuario: "", senha: "" })
     const [dbCliente, setDbCliente] = useState([])
     const [loading, setLoading] = useState(false)
-    const { setAutenticado, autenticado, setUser } = useContext(Context)
+    const { setAutenticado, setUser } = useContext(Context)
     const redirecionar = useNavigate()
 
     function handleSubmit(e) {
         e.preventDefault()
         setLoading(true)
+
         axios
             .get(`${FIREBASE_URL}/cliente.json`)
             .then(({ data, status }) => {
                 if (status === 200) {
-                    let retorno = Object.entries(data).map(([key, value]) => { return value })
+                    let retorno = Object
+                        .entries(data)
+                        .map(([key, value]) => { return value })
                     setDbCliente(retorno)
                 }
             })
@@ -56,7 +59,7 @@ function Cliente() {
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Acessar" />
                         <Link to="/cliente/new" className="btn btn-secondary mb-3">Novo Usuário</Link>
-                        <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
+                        <Link to="/" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
                 {loading && <div className="container">Carregando ...</div>}
@@ -154,7 +157,8 @@ function NovoCliente() {
 }
 
 function ClienteLogado() {
-    const { autenticado, setAutenticado, user, setUser, tickets, setTickets } = useContext(Context);
+    const { autenticado, setAutenticado, user, setUser } = useContext(Context);
+    const [tickets, setTickets] = useState([]);
     const redirecionar = useNavigate();
 
     function BuscarTickets() {
@@ -164,7 +168,7 @@ function ClienteLogado() {
                 .then(({ data, status }) => {
                     if (status === 200) {
                         const retorno = Object.entries(data).map(([key, value]) => { return { ...value, key: key } })
-                        setTickets(retorno)
+                        setTickets(retorno.reverse())
                     } else {
                         setTickets([])
                     }
@@ -177,7 +181,7 @@ function ClienteLogado() {
 
     function Loggout() {
         setAutenticado(false)
-        setUser("")
+        setUser({})
         alert(`Volte sempre, ${user.nome}`)
         redirecionar('/cliente')
     }
@@ -257,9 +261,10 @@ function ClienteLogado() {
 }
 
 function NovoTicket() {
-    const { ticket, setTicket, user } = useContext(Context)
+    const { user } = useContext(Context)
+    const [ticket, setTicket] = useState({});
     const redirecionar = useNavigate()
-    const [defaultTicket, setDefaultTicket] = useState({
+    const defaultTicket = {
         id: "",
         usuario: "",
         status: "",
@@ -268,7 +273,7 @@ function NovoTicket() {
         assunto: "",
         descricao: "",
         operador: "",
-    })
+    }
 
     function handleSubmitForm(e) {
         e.preventDefault()
@@ -331,7 +336,7 @@ function NovoTicket() {
 }
 
 function ClienteTickets() {
-    const { clienteAutenticado, atualCliente, ticket, setTicket, user } = useContext(Context)
+    const { autenticado, user, ticket, setTicket } = useContext(Context)
     const { key } = useParams()
 
     useEffect(() => {
@@ -345,8 +350,8 @@ function ClienteTickets() {
 
     return (
         <div className='container'>
-            {clienteAutenticado &&
-                <h1>Cliente: {`${atualCliente}`}</h1>
+            {autenticado &&
+                <h1>Cliente: {`${user.nome}`}</h1>
             }
             <div className="container">
                 <nav className='my-3 navbar bg-light container-fluid'>

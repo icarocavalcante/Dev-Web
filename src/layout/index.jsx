@@ -7,17 +7,13 @@ import logo from '../img/suporte.png'
 const Layout = () => {
 
     const [autenticado, setAutenticado] = useState(false)
-    const [user, setUser] = useState("")
-    const [ticket, setTicket] = useState()
-    const [tickets, setTickets] = useState([])
+    const [user, setUser] = useState({})
 
     return (
         <Context.Provider
             value={{
                 user, setUser,
-                autenticado, setAutenticado,
-                ticket, setTicket,
-                tickets, setTickets
+                autenticado, setAutenticado
             }}
         >
 

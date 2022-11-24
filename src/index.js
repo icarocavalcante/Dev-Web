@@ -27,7 +27,7 @@ root.render(
           </Route>
           <Route path='suporte'>
             <Route path='' element={<Suporte />} />
-            <Route path='logado' >
+            <Route path='autenticado' >
               <Route path='' element={<SuporteLogado />} />
               <Route path=':key' element={<SuporteTickets />} />
             </Route>

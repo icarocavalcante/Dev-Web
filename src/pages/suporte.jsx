@@ -3,19 +3,10 @@ import { useContext, useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { FIREBASE_URL } from '../constants'
 import Context from "../context"
-import DbConn from '../database/dbconn'
-import { ref, get, child, set } from 'firebase/database'
-
-
-const dataHora = () => {
-    let time = new Date()
-    let dataHora = time.toLocaleString()
-    return dataHora
-}
 
 function Suporte() {
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, setAtualSuporte } = useContext(Context)
-    const [suporte, setSuporte] = useState({ usuario: "", senha: "" })
+    const { setAutenticado, setUser } = useContext(Context)
+    const [suporte, setSuporte] = useState({})
     const [dbSuporte, setDbSuporte] = useState([])
     const [loading, setLoading] = useState(false)
     const redirecionar = useNavigate()
@@ -30,9 +21,8 @@ function Suporte() {
                 if (status === 200) {
                     const retorno = Object
                         .entries(data)
+                        .map(([key, value]) => {return value})
                     setDbSuporte(retorno)
-                } else {
-                    setDbSuporte([])
                 }
             })
             .catch((err) => alert(err))
@@ -43,21 +33,15 @@ function Suporte() {
     }
 
     useEffect(() => {
-        setSuporteAutenticado(false)
         for (let index = 0; index < dbSuporte.length; index++) {
-            if (dbSuporte[index][1].usuario === suporte.usuario && dbSuporte[index][1].senha === suporte.senha) {
-                setAtualSuporte(`${suporte.usuario}`)
-                setSuporteAutenticado(true)
+            if (dbSuporte[index].usuario === suporte.usuario && dbSuporte[index].senha === suporte.senha) {
+                setUser(dbSuporte[index])
+                setAutenticado(true)
+                alert(`Bem vindo(a), ${dbSuporte[index].nome}`)
+                redirecionar('/suporte/autenticado')
             }
         }
-    }, [dbSuporte, suporte.senha, suporte.usuario, setSuporteAutenticado])
-
-    useEffect(() => {
-        if (suporteAutenticado) {
-            alert(`Bem vindo(a), ${atualSuporte}`)
-            redirecionar('/login/suporte/logado')
-        }
-    }, [suporteAutenticado, suporte.usuario, redirecionar])
+    }, [dbSuporte])
 
     return (
         <div className="container d-flex justify-content-center">
@@ -74,7 +58,7 @@ function Suporte() {
                     </div>
                     <div className="container d-flex flex-row justify-content-around">
                         <input type="submit" className="btn btn-primary mb-3" value="Acessar" />
-                        <Link to="/home" className="btn btn-danger mb-3">Voltar</Link>
+                        <Link to="/" className="btn btn-danger mb-3">Voltar</Link>
                     </div>
                 </form>
                 {loading && <div className="container">Carregando ...</div>}
@@ -85,38 +69,41 @@ function Suporte() {
 }
 
 function SuporteLogado() {
-    const { suporteAutenticado, setSuporteAutenticado, atualSuporte, tickets, setTickets } = useContext(Context)
+    const { autenticado, setAutenticado, user, setUser } = useContext(Context)
+    const [tickets, setTickets] = useState([]);
     const redirecionar = useNavigate()
     
-    async function BuscarTickets() {
-        if (suporteAutenticado) {
+    function BuscarTickets() {
+        if (autenticado) {
             axios
                 .get(`${FIREBASE_URL}/tickets.json`)
                 .then(({ data, status }) => {
                     if (status === 200) {
                         const retorno = Object.entries(data).map(([key, value]) => { return { ...value, key: key } })
-                        setTickets(retorno)
+                        setTickets(retorno.reverse())
                     } else {
                         setTickets([])
                     }
                 })
                 .catch((err) => alert(err))
-                .finally(() => setSuporteAutenticado(true))
+        } else {
+            redirecionar('/suporte')
         }
     }
 
     function Loggout() {
-        setSuporteAutenticado(false)
-        alert(`Volte sempre, ${atualSuporte}`)
-        redirecionar('/')
+        setAutenticado(false)
+        setUser({})
+        alert(`Volte sempre, ${user.nome}`)
+        redirecionar('/suporte')
     }
 
-    useEffect(() => BuscarTickets, [suporteAutenticado])
+    useEffect(() => BuscarTickets, [])
 
     return (
         <div>
-            {suporteAutenticado &&
-                <h1>Bem vindo, {`${atualSuporte}`}</h1>
+            {autenticado &&
+                <h1>Bem vindo, {`${user.nome}`}</h1>
             }
             <div className="container">
 
@@ -137,23 +124,34 @@ function SuporteLogado() {
                                 if (el.status === "Em aberto") {
                                     return (
                                         <tr key={ix}>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.id}</Link></td>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.assunto}</Link></td>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.operador}</Link></td>
-                                            <td><Link className='text-danger' to={`/login/suporte/logado/${el.key}`}>{el.status}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.id}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.assunto}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.operador}</Link></td>
+                                            <td><Link className='text-danger' to={`/suporte/autenticado/${el.key}`}>{el.status}</Link></td>
                                         </tr>
                                     )
                                 } else if (el.status === "Concluído") {
                                     return (
                                         <tr key={ix}>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.id}</Link></td>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.assunto}</Link></td>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.dtAbertura}</Link></td>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.dtConclusao}</Link></td>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.operador}</Link></td>
-                                            <td><Link className='text-success' to={`/login/suporte/logado/${el.key}`}>{el.status}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.id}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.assunto}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.operador}</Link></td>
+                                            <td><Link className='text-success' to={`/suporte/autenticado/${el.key}`}>{el.status}</Link></td>
+                                        </tr>
+                                    )
+                                } else {
+                                    return (
+                                        <tr key={ix}>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.id}</Link></td>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.assunto}</Link></td>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.dtAbertura}</Link></td>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.dtConclusao}</Link></td>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.operador}</Link></td>
+                                            <td><Link className='text-secondary' to={`/suporte/autenticado/${el.key}`}>{el.status}</Link></td>
                                         </tr>
                                     )
                                 }
@@ -172,57 +170,45 @@ function SuporteLogado() {
 }
 
 function SuporteTickets() {
-    const { key } = useParams()
+    const { key } = useParams();
+    const { autenticado, user } = useContext(Context);
+    const [ticket, setTicket] = useState({});
+    const [fim, setFim] = useState();
     const redirecionar = useNavigate()
-    const { suporteAutenticado, atualSuporte, ticket, setTicket } = useContext(Context)
-
-    useEffect(function RecuperaTickets() {
+    
+    useEffect(() => {
         if (key) {
-            const db = DbConn()
-
-            const posts = ref(db);
-
-            get(child(posts, `tickets/${key}`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val()
-                    setTicket(data);
-                } else {
-                    console.log("No data available");
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
+            setFim(false)
+            axios
+                .get(`${FIREBASE_URL}/tickets/${key}.json`)
+                .then(({ data }) => { setTicket(data) })
+                .catch((err) => alert(err))
         }
-    }, [key])
+    }, [])
+    
+    function ConcluirTicket(){
+        let time = new Date();
+        let agora = time.toLocaleString();
+        setTicket({...ticket, status: "Concluído", dtConclusao: agora});
+        setFim(true)
+    };
 
-    function AlterarResposta(resposta) {
-        setTicket({ ...ticket, resposta: resposta.target.value })
-        SalvarTicket()
-    }
-
-    function SalvarTicket() {
-        setTicket({ assunto: ticket.assunto, descricao: ticket.descricao, usuario: ticket.usuario, status: "Concluído", id: ticket.id, dtAbertura: ticket.dtAbertura, dtConclusao: dataHora(), operador: atualSuporte, resposta: ticket.resposta })
-        console.log("alterado")
-    }
-
-    function ConcluirTicket() {
-        const db = DbConn()
-        const posts = ref(db)
-        set(child(posts, `tickets/${key}`), ticket).then(() => console.log("Salvo")).catch((err) => alert(err))
-    }
-
-    function ExcluirTicket() {
-        const db = DbConn()
-        const posts = ref(db)
-        set(child(posts, `tickets/${key}`), null).then(() => console.log("Salvo")).catch((err) => alert(err))
-        redirecionar('/login/suporte/logado')
-        key = null
-    }
+    useEffect(() => {
+        if (fim){
+            axios
+                .put(`${FIREBASE_URL}/tickets/${key}.json`, ticket)
+                .then(() => {
+                    alert("Alterado com sucesso!")
+                    redirecionar('/suporte/autenticado')
+                })
+                .catch((err) => alert(err))
+        }
+    }, [fim])
 
     return (
         <div className='container'>
-            {suporteAutenticado &&
-                <h1>Suporte: {`${atualSuporte}`}</h1>
+            {autenticado &&
+                <h1>Suporte: {`${user.usuario}`}</h1>
             }
             <div className="container">
                 <nav className='my-3 navbar bg-light container-fluid'>
@@ -265,12 +251,22 @@ function SuporteTickets() {
                     <label className="form-label" htmlFor="txtDescricao">Descrição do Ticket</label>
                     <textarea className='form-control' id="textDescricao" rows={5} value={`${ticket.descricao}`} />
                     <label className="form-label" htmlFor="txtResposta">Resposta do Operador</label>
-                    <textarea className='form-control' id="txtResposta" rows={5} placeholder={`${ticket.resposta}`} onChange={AlterarResposta} />
+                    {
+                        ticket.status === "Em aberto" ?
+                        <textarea className='form-control' id="txtResposta" rows={5} placeholder={`${ticket.resposta}`} onChange={({target: {value}}) => { setTicket({...ticket, resposta: value, operador:user.usuario}) }} /> :
+                        <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`} />
+                    }
                 </section>
                 <section className='container d-flex justify-content-between'>
-                    <button onClick={ConcluirTicket} className="btn btn-success mt-3">Concluir</button>
-                    <button onClick={ExcluirTicket} className="btn btn-danger mt-3">Excluir</button>
-                    <Link to="/login/suporte/logado" className="btn btn-secondary mt-3">Voltar</Link>
+                    {
+                        ticket.status === "Em aberto" &&
+                        <button onClick={() => ConcluirTicket()} className="btn btn-success mt-3">Concluir</button>
+                    }
+                    {
+                        ticket.status === "Em aberto" &&
+                        <button onClick={() => setFim(true)} className="btn btn-secondary mt-3">Alterar</button>
+                    }
+                    <Link to="/suporte/autenticado" className="btn btn-danger mt-3">Voltar</Link>
                 </section>
             </div>
         </div>
