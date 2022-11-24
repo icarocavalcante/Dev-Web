@@ -253,7 +253,7 @@ function SuporteTickets() {
                     <label className="form-label" htmlFor="txtResposta">Resposta do Operador</label>
                     {
                         ticket.status === "Em aberto" ?
-                        <textarea className='form-control' id="txtResposta" rows={5} placeholder={`${ticket.resposta}`} onChange={({target: {value}}) => { setTicket({...ticket, resposta: value, operador:user.usuario}) }} /> :
+                        <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`} onChange={({target: {value}}) => { setTicket({...ticket, resposta: value, operador:user.usuario}) }} /> :
                         <textarea className='form-control' id="txtResposta" rows={5} value={`${ticket.resposta}`} />
                     }
                 </section>

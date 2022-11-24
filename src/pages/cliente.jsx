@@ -273,6 +273,7 @@ function NovoTicket() {
         assunto: "",
         descricao: "",
         operador: "",
+        resposta: ""
     }
 
     function handleSubmitForm(e) {
@@ -288,7 +289,6 @@ function NovoTicket() {
     }
 
     useEffect(() => {
-        setTicket(defaultTicket);
         axios
             .get(`${FIREBASE_URL}/tickets.json`)
             .then(({ data, status }) => {
@@ -305,6 +305,7 @@ function NovoTicket() {
                         assunto: "",
                         descricao: "",
                         operador: "",
+                        resposta: "",
                         dtAbertura: agora
                     })
                 }
@@ -336,7 +337,8 @@ function NovoTicket() {
 }
 
 function ClienteTickets() {
-    const { autenticado, user, ticket, setTicket } = useContext(Context)
+    const { autenticado, user } = useContext(Context)
+    const [ticket, setTicket] = useState({})
     const { key } = useParams()
 
     useEffect(() => {
