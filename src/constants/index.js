@@ -1,3 +1,3 @@
-const FIREBASE_URL = 'https://tickets-web2022-default-rtdb.firebaseio.com'
+const FIREBASE_URL = 'https://dev-web41e1a-default-rtdb.firebaseio.com'
 
 export {FIREBASE_URL}

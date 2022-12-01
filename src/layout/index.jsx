@@ -38,9 +38,10 @@ const Layout = () => {
                 </main>
                 <footer className="mt-5">
                     <div className="container text-center">
-                        <p>Desenvolvido na disciplina de Desenvolvimento Web</p>
-                        <p>Thiago e Ícaro</p>
-                        <p>&copy; 2022 - Estacio</p>
+                        // Vc estiliza aqui como quiser
+                        {/* <p>Desenvolvido na disciplina de Desenvolvimento Web</p> */}
+                        {/* <p>Ícaro Cavalcante</p> */}
+                        {/* <p>&copy; 2022 - Estacio</p> */}
                     </div>
                 </footer>
             </div>
